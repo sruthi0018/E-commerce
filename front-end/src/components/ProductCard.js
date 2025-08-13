@@ -6,17 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
 
   const productImage = Array.isArray(product.images)
     ? product.images[0]
     : product.images;
-
-  const handleToggleWishlist = (e) => {
-    e.stopPropagation();
- 
-  };
 
   return (
     <div
@@ -30,22 +23,6 @@ export default function ProductCard({ product }) {
         position: "relative",
       }}
     >
-      {/* {user && (
-        <button
-          onClick={handleToggleWishlist}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            background: "none",
-            border: "none",
-            fontSize: "20px",
-            cursor: "pointer",
-          }}
-        >
-          {isWishlisted ? "❤️" : "🤍"}
-        </button>
-      )} */}
 
       {productImage && (
         <img
