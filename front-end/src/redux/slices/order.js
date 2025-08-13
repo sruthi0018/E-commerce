@@ -6,6 +6,7 @@ const initialState = {
   isLoading: false,
   error: null,
   order: null,
+  orders:[]
 };
 
 const slice = createSlice({
@@ -21,7 +22,12 @@ const slice = createSlice({
     },
     createOrderSuccess(state, action) {
       state.isLoading = false;
-      state.order = action.payload;
+           state.orders.push(action.payload);
+
+    },
+     getOrdersSuccess(state, action) {
+      state.isLoading = false;
+      state.orders = action.payload;
     },
   },
 });
@@ -42,5 +48,27 @@ export const createOrder = (orderData) => async (dispatch) => {
     dispatch(createOrderSuccess(res.data));
   } catch (error) {
     dispatch(hasError(error.response?.data?.message || error.message));
+  }
+};
+
+export const GetMyOrders = (params) => async (dispatch) => {
+ dispatch(slice.actions.startLoading());
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/v1/order/my`, { params });
+    console.log("gtp",response)
+ dispatch(slice.actions.getOrdersSuccess(response.data));
+  } catch (error) {
+   dispatch(slice.actions.hasError(error.message));
+  }
+};
+
+export const GetOrders = (params) => async (dispatch) => {
+ dispatch(slice.actions.startLoading());
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/v1/order`, { params });
+    console.log("gtp",response)
+ dispatch(slice.actions.getOrdersSuccess(response.data));
+  } catch (error) {
+   dispatch(slice.actions.hasError(error.message));
   }
 };

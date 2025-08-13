@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { createOrder } from "../redux/slices/order";
+import { clearCart } from "../redux/slices/cart";
 
 export default function CheckoutModal({ items, onClose }) {
   const dispatch = useDispatch();
@@ -27,14 +29,14 @@ export default function CheckoutModal({ items, onClose }) {
         quantity: i.quantity,
       })),
       totalPrice: preparedItems.reduce((sum, i) => sum + i.price * i.quantity, 0),
-      address,
+      shippingAddress:address,
     };
 
-    // dispatch(createOrder(orderData)).then(() => {
-    //   alert("Order placed successfully!");
-    //   dispatch(clearCart());
-    //   onClose();
-    // });
+    dispatch(createOrder(orderData)).then(() => {
+      alert("Order placed successfully!");
+      dispatch(clearCart());
+      onClose();
+    });
   };
 
   return (

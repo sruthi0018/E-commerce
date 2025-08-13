@@ -6,16 +6,24 @@ import { GetAllCategories } from "../redux/slices/category";
 import Header from "../components/header";
 import Sidebar from "../components/sidebar";
 import ProductList from "../components/ProductList";
-// import { GetAllSubCategories } from "../redux/slices/subCategory";
+import SideNav from "../components/Dashboard/sidenav";
+import AdminDashboard from "../components/Dashboard/adminDashboard";
+import { useAuth } from "../context/authContext";
+import ProductsPage from "./Dashboard/ProductListPage";
+import CategoriesPage from "./Dashboard/CategoryListPage";
+import OrdersTable from "./Dashboard/OrdersListPAge";
+
 
 export default function HomePage() {
   const dispatch = useDispatch();
+  const {user} = useAuth()
   const { products, total } = useSelector((state) => state.products);
-//   const { subCategories } = useSelector((state) => state.subCategory);
   const { categories } = useSelector((state) => state.categories);
   const [selectedSubIds, setSelectedSubIds] = useState([]);
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(-1);
+    const [activePage, setActivePage] = useState("dashboard");
+
+const [page, setPage] = useState(1);
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
 
@@ -45,6 +53,26 @@ useEffect(() => {
     setPage(1);
     setSelectedSubIds(subIds);
   };
+
+  if (user?.role === "admin") {
+    return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <Header isHome={true} />
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <SideNav activePage={activePage} setActivePage={setActivePage} />
+
+        <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+          {activePage === "dashboard" && <AdminDashboard />}
+          {activePage === "products" && <ProductsPage />}
+          {activePage === "categories" && <CategoriesPage />}
+          {activePage === "orders" && <OrdersTable />}
+          {/* {activePage === "inventory" && <InventoryPage />} */}
+        </div>
+      </div>
+    </div>
+    );
+  }
+
 
   return (
     <div

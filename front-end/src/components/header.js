@@ -17,7 +17,9 @@ console.log(isHome,"isHome")
     <header style={styles.header}>
       <h1>E-Commerce</h1>
       <div style={styles.right}>
-         {isHome ? (
+        {
+          user?.role !== "admin" &&(
+  isHome ? (
           <button
             onClick={() => navigate("/home")}
             style={styles.authButton}
@@ -32,20 +34,33 @@ console.log(isHome,"isHome")
             onChange={(e) => onSearch(e.target.value)}
             style={styles.input}
           />
-        )}
-        {token ? (
-          <>
-            <span>{user?.name}</span>
-            <button onClick={handleLogoutClick} style={styles.authButton}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <button onClick={() => navigate("/login")} style={styles.authButton}>
-            Sign In
-          </button>
-        )}
-        <FaShoppingCart style={styles.icon} onClick={() => navigate("/checkout")}/>
+        )
+          )
+        }
+       
+       {token ? (
+  <>
+    {user?.role !== "admin" && (
+      <button onClick={() => navigate("/myorders")} style={styles.authButton}>
+        My Orders
+      </button>
+    )}
+    <span>{user?.name}</span>
+    <button onClick={handleLogoutClick} style={styles.authButton}>
+      Logout
+    </button>
+  </>
+) : (
+  <button onClick={() => navigate("/login")} style={styles.authButton}>
+    Sign In
+  </button>
+)}
+{
+  user?.role !== "admin" &&(
+    <FaShoppingCart style={styles.icon} onClick={() => navigate("/checkout")}/>
+
+  )
+}
       </div>
  
     </header>

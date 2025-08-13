@@ -5,12 +5,13 @@ import { clearSingleProduct, GetProductById } from "../redux/slices/product";
 import { addToCart, removeFromCart, updateCartQty } from "../redux/slices/cart";
 import CheckoutModal from "../components/checkOut";
 import Header from "../components/header";
+import { useAuth } from "../context/authContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+const {token} = useAuth()
   const { product, loading } = useSelector((state) => state.products);
   const [selectedImage, setSelectedImage] = useState("");
   const [showCheckout, setShowCheckout] = useState(false);
@@ -88,7 +89,7 @@ export default function ProductDetail() {
             <button
               style={styles.cartBtn}
               onClick={handleAddToCart}
-              disabled={product.stock === 0}
+              disabled={product.stock === 0 || !token}
             >
               Add to Cart
             </button>
@@ -96,7 +97,7 @@ export default function ProductDetail() {
             <button
               style={styles.buyBtn}
               onClick={handleBuyNow}
-              disabled={product.stock === 0}
+              disabled={product.stock === 0 || !token}
             >
               Buy Now
             </button>
@@ -138,6 +139,7 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
   },
+  
   mainImage: {
     width: "100%",
     maxWidth: "400px",

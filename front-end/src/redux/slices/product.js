@@ -47,6 +47,10 @@ const slice = createSlice({
         state.products[index] = updated;
       }
     },
+        deleteProductSuccess(state, action) {
+      state.isLoading = false;
+      state.products = state.products.filter((c) => c._id !== action.payload);
+    },
     clearSingleProduct(state) {
   state.product = null;
 }
@@ -62,9 +66,11 @@ export function CreateProduct(data) {
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/v1/product`, data);
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/api/v1/product`, data
+        , { headers: { "Content-Type": "multipart/form-data" } }
+      );
       console.log("crpro",response.data)
-      dispatch(slice.actions.createProductSuccess(response.data));
+      dispatch(slice.actions.createProductSuccess(response.data.product));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;
@@ -98,26 +104,28 @@ export function GetProductById(id) {
   };
 }
 
-// export function SearchProducts(query) {
-//   return async (dispatch) => {
-//     dispatch(slice.actions.startLoading());
-//     try {
-//       const response = await axios.get(
-//         `${BASE_URL}/api/products/search/${query}`
-//       );
-//       dispatch(slice.actions.searchProductSuccess(response.data));
-//     } catch (error) {
-//       dispatch(slice.actions.hasError(error.message));
-//     }
-//   };
-// }
+export function DeleteProduct(id) {
+  return async (dispatch) => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const response = await axios.delete(`${process.env.REACT_APP_BASE_URL}/api/v1/product/${id}`);
+      dispatch(slice.actions.deleteProductSuccess(id));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+      throw error;
+    }
+  };
+}
 
 export function UpdateProduct(id, data) {
   return async (dispatch) => {
     dispatch(slice.actions.startLoading());
     try {
-      const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/api/v1/product/${id}`, data);
-      dispatch(slice.actions.updateProductSuccess(response.data));
+      const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/api/v1/product/${id}`, data,
+         { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      console.log(response.data,"up")
+      dispatch(slice.actions.updateProductSuccess(response.data.product));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
       throw error;
