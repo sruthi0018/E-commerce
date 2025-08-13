@@ -5,6 +5,7 @@ import LoginPage from './pages/Login';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import { AuthProvider } from './context/authContext';
+import CartPage from './pages/CartPage';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/home" element={<Home/>} />
         <Route path="/product/:id" element={<ProductDetail/>} />
+        <Route path="/checkout" element={<CartPage/>} />
       </Routes>
     </Router>
     </AuthProvider>
