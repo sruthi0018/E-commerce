@@ -19,7 +19,7 @@ export default function MyOrders ()  {
     <>
     <Header isHome="true"/>
     <div style={styles.container}>
-      <h2>My Orders</h2>
+      <h2 style={styles.heading}>My Orders</h2>
       {
         (!orders || orders.length === 0) &&(
            <p style={{ textAlign: "center" }}>No orders found.</p>
@@ -73,6 +73,7 @@ const styles = {
     marginBottom: "20px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   },
+    heading: { textAlign: "center", marginBottom: "20px" },
   orderHeader: {
     display: "flex",
     justifyContent: "space-between",

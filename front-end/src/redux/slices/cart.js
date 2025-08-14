@@ -102,3 +102,13 @@ export const updateCartQty = (productId, quantity) => async (dispatch) => {
     dispatch(slice.actions.hasError(error.message));
   }
 };
+
+export const ClearCart = () => async (dispatch) => {
+  dispatch(slice.actions.startLoading());
+  try {
+    await axios.delete(`${process.env.REACT_APP_BASE_URL}/api/v1/cart/clear`);
+    dispatch(slice.actions.clearCart()); 
+  } catch (error) {
+    dispatch(slice.actions.hasError(error.message));
+  }
+};

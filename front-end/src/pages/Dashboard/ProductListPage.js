@@ -1,27 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CreateProduct, DeleteProduct, GetAllProducts, UpdateProduct } from "../../redux/slices/product";
+import {
+  CreateProduct,
+  DeleteProduct,
+  GetAllProducts,
+  UpdateProduct,
+} from "../../redux/slices/product";
 import { useNavigate } from "react-router-dom";
 import ProductModal from "../../components/Dashboard/AddProduct";
 import ConfirmDialog from "../../components/Dialog/ConfirmationDialog";
+import AlertSnackbar from "../../components/Dialog/AlertSnackbar";
 
 export default function ProductsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-     const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const { products } = useSelector((state) => state.products);
-    const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleCloseSnackbar = () =>
+    setSnackbar((prev) => ({ ...prev, open: false }));
+
   const handleDeleteClick = (id) => {
     setDeleteId(id);
     setConfirmOpen(true);
   };
-  
-  const handleConfirmDelete = () => {
-    // call your delete API
-    dispatch(DeleteProduct(deleteId)); // or DeleteProduct(deleteId)
+
+ const handleConfirmDelete = async () => {
+    try {
+      await dispatch(DeleteProduct(deleteId));
+      await dispatch(GetAllProducts());
+      setSnackbar({
+        open: true,
+        message: "Product deleted successfully",
+        severity: "success",
+      });
+    } catch {
+      setSnackbar({
+        open: true,
+        message: "Failed to delete product",
+        severity: "error",
+      });
+    }
     setConfirmOpen(false);
     setDeleteId(null);
   };
@@ -29,10 +56,6 @@ export default function ProductsPage() {
   useEffect(() => {
     dispatch(GetAllProducts({ page: 1, limit: 100 }));
   }, [dispatch]);
-
-
-
-
 
   const handleAdd = () => {
     setEditProduct(null);
@@ -44,46 +67,60 @@ export default function ProductsPage() {
     setModalOpen(true);
   };
 
-const handleSubmit = async (data) => {  
-  try {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    formData.append("price", data.price);
-    formData.append("stock", data.stock);
-    formData.append("category", data.category);
+  const handleSubmit = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("price", data.price);
+      formData.append("stock", data.stock);
+      formData.append("category", data.category);
 
-    if (data.images && data.images.length > 0) {
-      data.images.forEach((file) => {
-        if (file) formData.append("images", file);
+      if (data.images && data.images.length > 0) {
+        data.images.forEach((file) => {
+          if (file) formData.append("images", file);
+        });
+      }
+
+       if (editProduct) {
+        await dispatch(UpdateProduct(editProduct._id, formData));
+        setSnackbar({
+          open: true,
+          message: "Product updated successfully",
+          severity: "success",
+        });
+      } else {
+        await dispatch(CreateProduct(formData));
+        setSnackbar({
+          open: true,
+          message: "Product created successfully",
+          severity: "success",
+        });
+      }
+
+      await dispatch(GetAllProducts());
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error submitting product:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to save product",
+        severity: "error",
       });
     }
-
-    if (editProduct) {
-      console.log("Update Product:", data);
-      await dispatch(UpdateProduct(editProduct._id, formData));  
-              await GetAllProducts()
-      
-    } else {
-      console.log("Add Product:", data);
-      await dispatch(CreateProduct(formData)); 
-    }
-    setModalOpen(false); 
-  } catch (error) {
-    console.error("Error submitting product:", error);
-  }
-};
-
-
+  };
 
   return (
     <div>
-        <h2>Products</h2>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
-          <button
-          onClick={handleAdd}
-          style={authButton}
-        >
+      <h2>Products</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px",
+        }}
+      >
+        <button onClick={handleAdd} style={authButton}>
           Add Product
         </button>
       </div>
@@ -116,7 +153,7 @@ const handleSubmit = async (data) => {
               <td style={tdStyle}>{prod.stock}</td>
               <td style={tdStyle}>
                 <button
-                  onClick={() =>handleEdit(prod)}
+                  onClick={() => handleEdit(prod)}
                   style={actionButtonStyle}
                 >
                   Edit
@@ -145,6 +182,12 @@ const handleSubmit = async (data) => {
         onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmOpen(false)}
       />
+       <AlertSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleCloseSnackbar}
+      />
     </div>
   );
 }
@@ -157,15 +200,15 @@ const thStyle = {
 const tdStyle = {
   padding: "12px",
 };
-const authButton= {
-    background: "#facc15",
-    color: "#000",
-    border: "none",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontWeight: "bold",
-  }
+const authButton = {
+  background: "#facc15",
+  color: "#000",
+  border: "none",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
 const actionButtonStyle = {
   backgroundColor: "#3b82f6",
   color: "#fff",

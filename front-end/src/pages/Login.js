@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '../context/authContext';
+import AlertSnackbar from '../components/Dialog/AlertSnackbar';
 
 
 
@@ -17,7 +18,11 @@ export default function LoginPage() {
 const {login} = useAuth()
     const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
+const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
@@ -30,16 +35,27 @@ const {login} = useAuth()
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-const onSubmit = async (formData) => {
-    console.log(formData)
-  const res = await login(formData);
-  if (res.success) {
-    navigate('/home'); 
-    alert('SignIn successful');
-  } else {
-    alert(res.message);
-  }
-};
+  const handleCloseSnackbar = () =>
+    setSnackbar((prev) => ({ ...prev, open: false }));
+
+  const onSubmit = async (formData) => {
+    console.log(formData);
+    const res = await login(formData);
+    if (res.success) {
+      setSnackbar({
+        open: true,
+        message: "SignIn successful",
+        severity: "success",
+      });
+      setTimeout(() => navigate("/home"), 1000);
+    } else {
+      setSnackbar({
+        open: true,
+        message: res.message || "Login failed",
+        severity: "error",
+      });
+    }
+  };
 
   return (
     <div style={{ ...styles.container, flexDirection: isMobile ? 'column' : 'row' }}>
@@ -81,6 +97,12 @@ const onSubmit = async (formData) => {
           </div>
         </div>
       )}
+       <AlertSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleCloseSnackbar}
+      />
     </div>
   );
 }

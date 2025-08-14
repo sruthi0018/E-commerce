@@ -11,17 +11,15 @@ export default function ProductDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-const {token} = useAuth()
+  const { token } = useAuth();
   const { product, loading } = useSelector((state) => state.products);
   const [selectedImage, setSelectedImage] = useState("");
   const [showCheckout, setShowCheckout] = useState(false);
-
 
   useEffect(() => {
     if (id) dispatch(GetProductById(id));
     return () => dispatch(clearSingleProduct());
   }, [id, dispatch]);
-
 
   useEffect(() => {
     if (product?.images?.length > 0) {
@@ -37,12 +35,10 @@ const {token} = useAuth()
     ? process.env.REACT_APP_UPLOAD_URL + selectedImage
     : "";
 
-
   const handleAddToCart = () => {
     dispatch(addToCart({ productId: product._id, quantity: 1 }));
     navigate("/checkout");
   };
-
 
   const handleBuyNow = () => {
     setShowCheckout(true);
@@ -50,68 +46,74 @@ const {token} = useAuth()
 
   return (
     <>
-    <Header isHome="true"/>
-    <div style={styles.page}>
-      <div style={styles.container}>
-       
-        <div style={styles.imageBox}>
-          <img src={mainImage} alt={product.title} style={styles.mainImage} />
-          <div style={styles.thumbnailRow}>
-            {product.images?.map((img, idx) => (
-              <img
-                key={idx}
-                src={process.env.REACT_APP_UPLOAD_URL + img}
-                alt={`thumb-${idx}`}
-                onClick={() => setSelectedImage(img)}
-                style={{
-                  ...styles.thumbnail,
-                  border:
-                    selectedImage === img
-                      ? "2px solid #1e3a8a"
-                      : "1px solid #ccc",
-                }}
-              />
-            ))}
+      <Header isHome="true" />
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.imageBox}>
+            <img src={mainImage} alt={product.title} style={styles.mainImage} />
+            <div style={styles.thumbnailRow}>
+              {product.images?.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={process.env.REACT_APP_UPLOAD_URL + img}
+                  alt={`thumb-${idx}`}
+                  onClick={() => setSelectedImage(img)}
+                  style={{
+                    ...styles.thumbnail,
+                    border:
+                      selectedImage === img
+                        ? "2px solid #1e3a8a"
+                        : "1px solid #ccc",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div style={styles.details}>
+            <h1 style={styles.title}>{product.title}</h1>
+            <p style={styles.category}>Category: {product.category?.name}</p>
+            <p style={styles.price}>₹{product.price}</p>
+            <p style={styles.description}>{product.description}</p>
+            <p
+              style={{
+                ...styles.stock,
+                color: product.stock > 0 ? "green" : "red",
+                fontWeight: "bold",
+              }}
+            >
+              {product.stock > 0
+                ? `In Stock (${product.stock})`
+                : "Out of Stock"}
+            </p>
+
+            <div style={styles.actions}>
+              <button
+                style={styles.cartBtn}
+                onClick={handleAddToCart}
+                disabled={product.stock === 0 || !token}
+              >
+                Add to Cart
+              </button>
+
+              <button
+                style={styles.buyBtn}
+                onClick={handleBuyNow}
+                disabled={product.stock === 0 || !token}
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
 
-        
-        <div style={styles.details}>
-          <h1 style={styles.title}>{product.title}</h1>
-          <p style={styles.category}>Category: {product.category?.name}</p>
-          <p style={styles.price}>₹{product.price}</p>
-          <p style={styles.description}>{product.description}</p>
-          <p style={styles.stock}>
-            {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
-          </p>
-
-          <div style={styles.actions}>
-            <button
-              style={styles.cartBtn}
-              onClick={handleAddToCart}
-              disabled={product.stock === 0 || !token}
-            >
-              Add to Cart
-            </button>
-
-            <button
-              style={styles.buyBtn}
-              onClick={handleBuyNow}
-              disabled={product.stock === 0 || !token}
-            >
-              Buy Now
-            </button>
-          </div>
-        </div>
+        {showCheckout && (
+          <CheckoutModal
+            items={product}
+            onClose={() => setShowCheckout(false)}
+          />
+        )}
       </div>
-
-      {showCheckout && (
-        <CheckoutModal
-          items={product}
-          onClose={() => setShowCheckout(false)}
-        />
-      )}
-    </div>
     </>
   );
 }
@@ -139,7 +141,7 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
   },
-  
+
   mainImage: {
     width: "100%",
     maxWidth: "400px",

@@ -1,25 +1,26 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useAuth } from "../../context/authContext";
 
 const drawerWidth = 240;
-export default function SideNav({ activePage, setActivePage }) {
+
+export default function SideNav() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
-    { label: "Dashboard", key: "dashboard", show: true },
-    { label: "Products", key: "products", show: true },
-    { label: "Categories", key: "categories", show: true },
-    { label: "Orders", key: "orders", show: true },
-    { label: "Inventory", key: "inventory", show: true },
-    { label: "Staff", key: "staff", show: user?.role === "superadmin" },
+    { label: "Dashboard", path: "/home", show: true },
+    { label: "Categories", path: "/home/categories", show: true },
+    { label: "Products", path: "/home/products", show: true },
+    { label: "Orders", path: "/home/orders", show: true },
+
   ];
 
   return (
     <aside
       style={{
-        width: 240,
+        width: drawerWidth,
         height: "100%",
         backgroundColor: "#1e3a8a",
         color: "#facc15",
@@ -33,11 +34,11 @@ export default function SideNav({ activePage, setActivePage }) {
         {navItems
           .filter((item) => item.show)
           .map((item) => {
-            const isSelected = activePage === item.key;
+            const isSelected = location.pathname === item.path;
             return (
-              <li key={item.key} style={{ marginBottom: "10px" }}>
+              <li key={item.path} style={{ marginBottom: "10px" }}>
                 <button
-                  onClick={() => setActivePage(item.key)}
+                  onClick={() => navigate(item.path)}
                   style={{
                     width: "100%",
                     textAlign: "left",

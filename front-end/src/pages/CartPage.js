@@ -6,6 +6,7 @@ import {
   clearCart,
   updateCartQty,
   getCart,
+  ClearCart,
 } from "../redux/slices/cart";
 import CheckoutModal from "../components/checkOut";
 import Header from "../components/header";
@@ -91,7 +92,7 @@ export default function CartPage() {
             </button>
             <button
               style={styles.clearBtn}
-              onClick={() => dispatch(clearCart())}
+              onClick={() => dispatch(ClearCart())}
             >
               Clear Cart
             </button>

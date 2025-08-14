@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "../context/authContext";
+import AlertSnackbar from "../components/Dialog/AlertSnackbar";
 
 
 const schema = Yup.object().shape({
@@ -16,6 +17,14 @@ export default function SignupPage() {
   const { signup } = useAuth();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+ const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleCloseSnackbar = () =>
+    setSnackbar((prev) => ({ ...prev, open: false }));
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -29,16 +38,25 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = async (formData) => {
-    console.log(formData, "formdata");
-    const res = await signup(formData);
-    if (res.success) {
-      alert("Signup successful");
-      navigate("/login");
-    } else {
-      alert(res.message);
-    }
-  };
+const onSubmit = async (formData) => {
+  console.log(formData, "formdata");
+  const res = await signup(formData);
+  if (res.success) {
+    setSnackbar({
+      open: true,
+      message: "Signup successful",
+      severity: "success",
+    });
+    setTimeout(() => navigate("/login"), 1000);
+  } else {
+    setSnackbar({
+      open: true,
+      message: res.message || "Signup failed",
+      severity: "error",
+    });
+  }
+};
+
 
   return (
     <div
@@ -106,6 +124,12 @@ export default function SignupPage() {
           </form>
         </div>
       </div>
+        <AlertSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleCloseSnackbar}
+      />
     </div>
   );
 }
