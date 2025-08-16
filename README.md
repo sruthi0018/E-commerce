@@ -20,8 +20,9 @@ It provides a full shopping experience for customers and a powerful dashboard fo
 
 ### 🛠 Admin Dashboard
 - **Admin Authentication**: Secure login for administrators
-- **Product Management**: Create, update, delete, and list products
-- **Image Upload**: Upload product images (local storage or cloud)
+- **Category Management** – Create, update, and delete product categories.
+- **Product Management**: Create, update, delete, and view products under specific categories.
+- **Image Upload**: Upload product images 
 - **Order Management**: View and update customer orders
 - **Inventory Overview**: Track stock levels
 - **Live Notifications**: Real-time alerts when new orders are placed using **Socket.IO**
